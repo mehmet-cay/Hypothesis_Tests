@@ -1,0 +1,84 @@
+---
+title: "MANOVA"
+author: "Mehmet ÇAY"
+date: '2022-08-20'
+output: 
+  html_document: 
+    toc: yes
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## MANOVA
+
+Manova is kind of ANOVA but only one differences, there are more than one dependent variable. Our dependent variables will be chol and thalach.
+
+```{r}
+library(tidyverse)
+library(rstatix)
+library(mvnormtest)
+
+heart <- read.csv("C:/Users/Mehmet ÇAY/Desktop/R/Hypothesis_Tests/heart.csv")
+
+heart %>% group_by(cp) %>% summarise(Shapiro = mshapiro_test(cbind(chol,thalach))$p.value)
+
+identify_outliers(heart["chol"])
+identify_outliers(heart["thalach"])
+quantile(heart$thalach)
+
+heart <- heart %>% filter( chol < 394 & thalach > 71)
+
+heart %>% group_by(cp) %>% summarise(Shapiro = mshapiro_test(cbind(chol,thalach))$p.value)
+```
+Dataset and variables are arranged in order to do test.
+
+```{r}
+library(heplots)
+
+bartlettTests(y=heart[c("chol","thalach")],group = heart$cp)
+leveneTests(y = heart[c("chol" , "thalach")] , group = heart$cp )
+```
+Both Bartlett and Levene verify homogenity of variances.
+
+```{r}
+box_m(heart[c("chol" , "thalach")] , group = heart$cp)
+```
+
+P-Value is greater than .05, so Ho is true, covariances matrices are similar.
+So we can apply MANOVA.
+```{r}
+manova <- manova(cbind(chol,thalach)~ cp, data=heart)
+summary(manova)
+```
+H-alternative is true. There are differences between groups.
+
+## Post Hoc
+
+In order to find which group is different , we need to do Post Hoc test.
+
+```{r}
+grouped_heart <- heart %>% gather(key="variable",value="value",thalach , chol) %>% group_by(variable)
+
+```
+### Welch Anova Test
+```{r}
+grouped_heart %>% convert_as_factor(cp) %>% welch_anova_test(value ~ cp)
+```
+Cholesterol does not get affected by cp but thalach gets affected by cp.
+
+### TukeyHSD Test
+```{r}
+grouped_heart %>% convert_as_factor(cp) %>% 
+                tukey_hsd(value ~ cp)
+```
+TukeyHSD verifies our results.
+
+### Games-Howell Test
+```{r}
+grouped_heart %>% convert_as_factor(cp) %>% 
+            games_howell_test(value ~ cp)
+```
+Games-Howell verifies our results.

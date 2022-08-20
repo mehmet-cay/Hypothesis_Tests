@@ -1,0 +1,44 @@
+---
+title: "Kruskel Wallis"
+author: "Mehmet ÇAY"
+date: '2022-08-20'
+output: 
+  html_document: 
+    toc: yes
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Kruskel Wallis
+
+Kruskal Wallis is a non-parametic test. It is basically ANOVA for nan-parametic independents datasets.
+
+```{r}
+library(tidyverse)
+
+heart <- read.csv("C:/Users/Mehmet ÇAY/Desktop/R/Hypothesis_Tests/heart.csv")
+
+heart %>% group_by(cp) %>% summarise(Normality = shapiro.test(oldpeak)$p.value)
+bartlett.test(heart$oldpeak ~ heart$cp)
+```
+Oldpeak is sort of medicine term. Values are not normal and homogeneity also. They are suitable for Kruskal Wallis Test.
+```{r}
+kruskal.test(x=heart$oldpeak,g=as.factor(heart$cp))
+```
+
+# Dunn's Test
+Result says there is a significant differences at least one group. Let's do Dunn's test in order to find which group is different. It is sort of Post Hoc.
+```{r}
+library(dunn.test)
+
+dunn.test(x=heart$oldpeak,g=heart$cp)
+```
+Results say all groups(except 0 and 3) are different significantly.
+
+```{r}
+dunn.test(x=heart$oldpeak,g=heart$cp,method="bonferroni")
+```
+Bonferroni methods verified our interpretation.

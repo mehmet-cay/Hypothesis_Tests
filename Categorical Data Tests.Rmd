@@ -1,0 +1,89 @@
+---
+title: "Categorical Data Tests"
+author: "Mehmet ÇAY"
+date: '2022-08-20'
+output: 
+  html_document: 
+    toc: yes
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Categorical Data Tests
+
+Dataset is a survey. It is About mental health.
+
+## Binom Test
+```{r}
+survey <- read.csv("C:/Users/Mehmet ÇAY/Desktop/R/Hypothesis_Tests/survey.csv")
+
+question1 <- survey$treatment
+
+q1 <- question1[question1=="Yes"]
+q2 <- append(q1, question1[question1=="No"]) 
+
+table(q2)
+```
+```{r}
+binom.test(x=637,n=1259,p=0.5)
+```
+P-Value is greater than .05, so Ho is true, half of the people took treatment in 95 percent confidence interval.
+
+## Chi-Square Goodness of Fit Test
+
+It is almost same with Binom test, only differences it is used when there are more than 2 category.
+
+```{r}
+work_interfere <- survey$work_interfere
+table(work_interfere)
+
+result <- chisq.test(table(work_interfere))
+result$expected
+result$observed
+result$p.value
+```
+We can see what we expect and what we observe. P-value says observed values are not similar to expected values.
+
+## Chi-Square Test of Independence
+
+
+
+```{r}
+data <- data.frame(x=survey$remote_work,y=survey$seek_help)
+tbl <- table(data)
+
+prop.table(table(data)) #table of probability
+
+chisq.test(tbl)
+```
+Ho: Groups are independents. There is no relations.
+P-value is greater than .05, so Ho is true. Therefore, there is no relationship between seeking help and working remote.
+
+## Fisher Exact Test
+
+It is used when any cell in the table is lower than 5.
+```{r}
+data2 <- data.frame(x=survey$treatment,y=survey$tech_company)
+tbl2 <- table(data2)
+
+fisher.test(tbl2)
+```
+
+Ho is true, odds ratio is equal to 1(95 percent confidence interval). So there is no relationship between working tech company and taking treatment.
+
+## McNemar's Test
+
+It is same with Fisher Exact Test but is used when we have two category and before-after situation(dependent).
+```{r}
+
+mydata <- data.frame(
+          once = c('yes','yes','yes','yes','no','no'),
+          sonra = c('no','yes','yes','no','no','no')
+)
+
+mcnemar.test(table(mydata))
+```
+Ho: There is no change. Ho is true. There is no change between before and after.

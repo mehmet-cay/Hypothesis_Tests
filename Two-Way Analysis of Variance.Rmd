@@ -1,0 +1,71 @@
+---
+title: "Two-Way Analysis of Variance"
+author: "Mehmet ÇAY"
+date: '2022-08-20'
+output: 
+  html_document: 
+    toc: yes
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Two-Way Analysis of Variance
+
+```{r}
+library(tidyverse)
+library(rstatix)
+heart <- read.csv("C:/Users/Mehmet ÇAY/Desktop/R/Hypothesis_Tests/heart.csv")
+
+data <- heart %>% filter(chol<394)
+data %>% group_by(cp,fbs) %>% summarise(ShapiroResults = shapiro.test(chol)$p.value)
+
+```
+Cp represents pain type in the chest. Fbs represents blood pressure (if it is greater than 120, value will be 1, otherwise 0). Data grouped by cp and fbs and all cholesterol values are normal.
+```{r}
+bartlett.test(data$chol ~interaction(data$cp,data$fbs))
+```
+Homogeneity of variances between groups is true. Two-way anova should be done.
+```{r}
+anova <-aov(data$chol ~ as.factor(data$cp)*as.factor(data$fbs))
+summary(anova)
+```
+P-values are greater than .05, H-alternative says there is no differences between groups.
+
+## TukeyHSD in Two-Way Analysis of Variance
+
+```{r}
+identify_outliers(heart["trestbps"])
+
+data2 <- heart %>% filter(trestbps < 172)
+int_groups <- apply(data2, MARGIN = 1 , FUN = function(x){  
+                  r <- paste0( x["cp"] , ' - ' , x["fbs"])
+                  return(r)
+  } )
+
+data2$int_groups <- int_groups
+
+library(ggpubr)
+ggboxplot(data2, x = "int_groups" , y = "trestbps" , title = "Graph",
+          color = "green")
+```
+Graph hepls to understand which group is different. However, we neet to be sure of that.
+```{r}
+data2 %>% group_by(cp , fbs) %>% 
+            summarise(Shapiro = shapiro.test(trestbps)$p.value)
+  
+bartlett.test(data2$trestbps ~ interaction(data2$cp , data2$fbs)) 
+  
+
+anova2 <- aov(data2$trestbps ~ as.factor(data2$cp) * as.factor(data2$fbs))
+summary(anova2)
+
+```
+Variables are suitable for anova. Anova result says cp effects trestbps, fbs is in the border, we are not sure.
+```{r}
+TukeyHSD(anova2)
+```
+If p-value is lower than .05, it means there is significantly differences there.
+It can be said cp3 is different from cp0, cp1 and cp2. fbs can be effective. And cp 3:1 - fbs 1:0 may be effective.

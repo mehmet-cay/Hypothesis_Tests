@@ -1,0 +1,37 @@
+---
+title: "Wilcoxon Rank Sums Test"
+author: "Mehmet ÇAY"
+date: '2022-08-19'
+output: 
+  html_document: 
+    toc: yes
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Wilcoxon Rank Sums Test
+
+Compares the shift of locations in non-normally distributed data. Basically it is used in non-normal distribution and it is a nonparametric alternative to the two sample t-test.
+```{r}
+weatherAUS <- read.csv("C:/Users/Mehmet ÇAY/Desktop/R/Hypothesis_Tests/weatherAUS.csv")
+
+Albury <- data.frame(weatherAUS$Temp9am[weatherAUS$Location=="Albury"])
+Albury <- Albury[1:2988,]
+Cobar <- data.frame(weatherAUS$Temp9am[weatherAUS$Location=="Cobar"])
+Cobar <- Cobar[1:2988,]
+df <- c(Albury,Cobar)
+groups <- c(rep("Albury",2988),rep("Cobar",2988))
+
+shapiro.test(Albury)
+shapiro.test(Cobar)
+
+data <- data.frame("Temp"=df,"groups"=groups)
+```
+Dataset show us weather values in Australia's cities. What we are going to do is compare two cities temperature values at 9 am. Datas are not both normal which means they are suitable for test.
+```{r}
+wilcox.test(data$Temp ~ data$groups,mu=0)
+```
+P-value is much lower than .05, so differences is not equal to 0. These two cities have different temperature 9 am.

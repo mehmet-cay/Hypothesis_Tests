@@ -1,0 +1,53 @@
+---
+title: "Normality Tests"
+author: "Mehmet ÇAY"
+date: '2022-08-17'
+output: 
+  html_document: 
+    toc: yes
+    highlight: zenburn
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This document created to show normality tests.
+
+# Shapiro-Wilk Test
+
+Shapiro-Wilk Test is used to understand whether dataset is normal or not. We are going to choose random 5000 elements because Shapiro-Wilk test can only test 3-5000 variables.
+
+```{r}
+library(tidyverse)
+Movies <- read.csv("C:/Users/Mehmet ÇAY/Desktop/R/Hypothesis_Tests/Movies.csv")
+
+data <- Movies %>% select(popularity)
+set.seed(920)
+Index <- sample(1:nrow(data),size=5000)
+smallData <- data[Index,]
+hist(smallData)
+```
+
+We can see that the data is not normal. However, we need to test it to understand better, despite everything is clear in this dataset.
+
+```{r}
+shapiro.test(smallData)
+```
+
+We chose first 5000 rows , p-value(=2.2e-16) is much smaller than 0.05, so Ho is false, data is not normal.
+
+# Kolmogorov-Smirnov Normality Test
+
+If we had a dataset that has element smaller than 30, we need to do Kolmogorov-Smirnov Test because Shapiro-Wilk test can show us wrong result.
+
+```{r}
+dataset <- iris[1:25,]
+nrow(dataset)
+hist(dataset$Sepal.Length)
+ks.test(dataset$Sepal.Length,pnorm)
+```
+
+In the graph it almost seems normal but again we can not be sure exactly. Test reults says p-value(=2.2e-16) is smaller than 0.05, so Ho is wrong, data is not normal.

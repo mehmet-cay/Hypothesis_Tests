@@ -1,0 +1,49 @@
+---
+title: "ANOVA"
+author: "Mehmet ÇAY"
+date: '2022-08-19'
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    toc: yes
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## ANOVA
+
+```{r echo=TRUE}
+library(tidyverse)
+library(rstatix)
+
+heart <- read.csv("C:/Users/Mehmet ÇAY/Desktop/R/Hypothesis_Tests/heart.csv")
+
+outliers <- identify_outliers(heart["chol"])
+outliers$chol
+outliers$is.outlier
+
+data <- heart %>% filter(chol <394)
+
+```
+Dataset shows cholosterol according to some factors. We are trying to find whether cholosterol depends on sex or not.
+
+```{r echo=TRUE}
+data %>% group_by(sex) %>% summarise(ShapiroResults = shapiro.test(chol)$p.value)
+```
+ Data grouped. P-values say both group normal.
+
+```{r}
+bartlett.test(data$chol ~ data$sex)
+```
+Bartlett test says homogeneity is true.(p>.05)
+
+```{r}
+anov <- aov(data$chol ~ data$sex)
+anov
+summary(anov)
+```
+Anova p-value is .03, which is lower than .05, that means sex doe not have influence on cholosterol.

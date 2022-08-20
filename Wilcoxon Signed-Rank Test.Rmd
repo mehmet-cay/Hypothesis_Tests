@@ -1,0 +1,28 @@
+---
+title: "Wilcoxon Signed-Rank Test"
+author: "Mehmet ÇAY"
+date: '2022-08-17'
+output: 
+  html_document: 
+    toc: yes
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Wilcoxon Signed-Rank Test
+
+This test does same job as T-Test. Only one differences, dataset must not be normal.
+
+```{r}
+
+shapiro.test(cars$dist)
+
+```
+Data is not normal.
+```{r}
+wilcox.test(cars$dist,mu=40)
+```
+P-Value is greater than 0.05, so Ho is true. Mean of data is equal to 40.

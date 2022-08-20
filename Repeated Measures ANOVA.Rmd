@@ -1,0 +1,37 @@
+---
+title: "Repeated Measures ANOVA"
+author: "Mehmet ÇAY"
+date: '2022-08-19'
+output: 
+  html_document: 
+    toc: yes
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Repeated Measures ANOVA
+
+```{r}
+library(ggpubr)
+library(tidyverse)
+library(rstatix)
+
+DesignTest <- read.csv("C:/Users/Mehmet ÇAY/Desktop/R/Hypothesis_Tests/DesignTest.csv")
+
+data <- DesignTest %>% gather(key="Groups",value="Scores",ADesign,BDesign,CDesign) %>% convert_as_factor(Groups)
+
+data %>% group_by(Groups) %>% summarise(ShapiroResults = shapiro.test(Scores)$p.value)
+
+ggboxplot(data, x="Groups",y="Scores",color="green")
+```
+Dataset shows 3 different web design and their scores. Values are normal and dependent.
+In the graph, it seems obviously design type matters.
+```{r}
+ids <- c(rep(seq(1, 100) , 3))
+data$wid = ids
+anova_test(data , dv = "Scores" , within = "Groups" , wid = "wid")
+```
+Anova results say its p-value is much lower than .05 which means groups are not same. And GES is high, that tells differences is really striking.

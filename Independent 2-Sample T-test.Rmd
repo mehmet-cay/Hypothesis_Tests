@@ -1,0 +1,38 @@
+---
+title: "Independent 2-Sample T-test"
+author: "Mehmet ÇAY"
+date: '2022-08-19'
+output: 
+  html_document: 
+    toc: yes
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Independent 2-Sample T-test
+
+It is the comparison of the mean of the observations of two continuous and normally distributed sub-samples (homogeneous variance should be approximately the same) with each other.
+
+```{r}
+df <- subset(iris , subset = (Species != "virginica"))
+df$Species <- as.character(df$Species)
+par(mfrow = c(1,2))
+hist(df$Sepal.Width[df$Species == "setosa"])
+hist(df$Sepal.Width[df$Species == "versicolor"])
+
+```
+Datasets show us the sepal width of iris according to species. What we are going to do is compare the sepal width values by species.
+```{r}
+shapiro.test(df$Sepal.Width[df$Species == "setosa"])
+shapiro.test(df$Sepal.Width[df$Species == "versicolor"])
+
+bartlett.test(df$Sepal.Width ~ df$Species)
+```
+Shapiro-Wilk test says data is normal. Bartlett homogeneity test says there exists variances homogenity. Our dataset is suitable for Independent 2-Sample T-test.
+```{r}
+t.test(df$Sepal.Width ~ df$Species , mu = 0 , var.equal = TRUE  )
+```
+P-value is much lower than .05. It means there exists significant differences between values of sepal width those two species. Test says average differences between groups is 0.519895 - 0.796105 in %95 confidence interval.

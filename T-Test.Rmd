@@ -1,0 +1,35 @@
+---
+title: "T-Test"
+author: "Mehmet ÇAY"
+date: '2022-08-17'
+output: 
+  html_document: 
+    toc: yes
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# T-Test
+
+Students' T-test or T-Test measure whether mean of dataset is different value that is given or not.
+```{r}
+
+Heights <- read.csv("C:/Users/Mehmet ÇAY/Desktop/R/Hypothesis_Tests/Height of Male and Female by Country 2022.csv")
+
+shapiro.test(Heights$Male.Height.in.Cm)
+
+set.seed(115)
+sample <- sample(Heights$Male.Height.in.Cm, size=100)
+shapiro.test(sample)
+t.test(sample,mu=180)
+```
+First we do T-Test on normal data. That's why we did shapiro test twice(be sure exactly).Data shows mean heights of males and females according to countries. We took a sample from dataset. P-Value(<2.2e-16) means mean is not 180 cm in %95 confidence interval.
+Test showed us in 95 percent confidence interval mean is 173.0641 (172.1012 - 174.0270).
+So let's try again.
+```{r}
+t.test(sample,mu=173)
+```
+And p-value is now 0.1577 which is greater than 0.8952. That means Ho is true, in 95 probability our mean is 173 cm.

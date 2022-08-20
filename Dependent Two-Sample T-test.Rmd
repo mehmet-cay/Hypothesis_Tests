@@ -1,0 +1,47 @@
+---
+title: "Dependent Two-Sample T-test"
+author: "Mehmet ÇAY"
+date: '2022-08-19'
+output: 
+  html_document: 
+    toc: yes
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Dependent Two-Sample T-test
+
+This test is used to compare mean of two dependent groups. Dependent groups means subject of one group provide data for another group.
+Also groups must be normal distrubution.
+
+```{r}
+InsPost <- read.csv("C:/Users/Mehmet ÇAY/Desktop/R/Hypothesis_Tests/InsPostComparison.csv")
+
+RandomPosts <- InsPost$RPostsDuration
+RelatedPosts <- InsPost$LPostsDuration
+duration <- c(RandomPosts,RelatedPosts)
+groups <- c(rep("Random",50),rep("Liked",50))
+df <- data.frame("duration" = duration,"groups"=groups)
+View(df)
+
+shapiro.test(df$duration[df$groups=="Random"])
+shapiro.test(df$duration[df$groups=="Liked"])
+
+```
+
+Dataset defines instagram post duration that belongs related posts and random posts. Both groups data are normal.
+
+```{r}
+bartlett.test(df$duration ~ df$groups)
+```
+P-Value is greater than .05, it means differences homogenity of variances equal to 0. 
+Bartlett homogeneity test is used to understand variances homogeneity on normal continuity datasets.
+
+```{r}
+t.test(df$duration ~ df$groups , mu = 0 , paired = T)
+```
+P-value is lower than .05, so there is a significant difference between datasets. Differencces is not equal to 0. Test says mean differences %95 confidence interval is 4.7534.
+So, it can be said that there is truly differences when someone sees random or related posts.

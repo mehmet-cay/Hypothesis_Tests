@@ -1,0 +1,37 @@
+---
+title: "Post Hoc- TukeyHSD"
+author: "Mehmet ÇAY"
+date: '2022-08-20'
+output: 
+  html_document: 
+    toc: yes
+    highlight: zenburn
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Post Hoc-TukeyHSD
+
+```{r}
+library(tidyverse)
+library(rstatix)
+
+DesignTest <- read.csv("C:/Users/Mehmet ÇAY/Desktop/R/Hypothesis_Tests/DesignTest.csv")
+
+data <- DesignTest %>% gather(key="Groups",value="Scores",ADesign,BDesign,CDesign) %>% convert_as_factor(Groups)
+
+data %>% group_by(Groups) %>% summarise(ShapiroResults = shapiro.test(Scores)$p.value)
+
+ids <- c(rep(seq(1, 100) , 3))
+data$wid = ids
+anova <- anova_test(data , dv = "Scores" , within = "Groups" , wid = "wid")
+```
+TukeyHSD tells us which group is different( Anova tells at least one group is different but which one).
+Codes are from previous file.
+
+```{r}
+tukey_hsd(data,Scores ~ Groups)
+```
+Groups were compared one by one. All p-values are much lower than .05, so All groups are different from each other.
